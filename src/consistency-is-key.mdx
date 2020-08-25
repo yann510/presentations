@@ -1,0 +1,208 @@
+import { CodeSurfer } from "code-surfer";
+import { github, vsDark } from "@code-surfer/themes";
+import { TextBlock } from "./components/TextBlock";
+
+export const theme = vsDark;
+
+<TextBlock margin={20}>
+
+# Consistency is key for a faster development experience
+
+</TextBlock>
+
+---
+
+# Here are some tips to achieve that
+
+---
+
+## Write as many re-usable components as possible
+
+---
+
+<CodeSurfer>
+
+```jsx title="The HTML way (✕)"
+<span className="badge-lg badge-secondary">I'm a badge</span>
+```
+
+```tsx title="The React way (✓)"
+interface Props {
+  className?: string
+  size?: 'lg'
+  color?: 'primary'
+}
+
+const Badge: React.FC<Props> = ({ className, size, color, children }) => {
+  const badgeSize = size || 'lg'
+  const badgeColor = color || 'primary'
+  const class = `badge-${badgeSize} badge-${badgeColor} ${className || ''}`
+
+  return <div className={class}>{children}</div>
+}
+```
+
+</CodeSurfer>
+
+---
+
+### Writing as many re-usable components provides multiple benefits:
+
+<ul>
+    <li>New comers don't need to learn where the code of specific blocks are located in order to copy them</li>
+    <Steps>
+        <li>Available features are described through the props</li>
+        <li>Uses less boiler plate for the same result</li>
+        <li>Favors re-usability</li>
+    </Steps>
+</ul>
+
+---
+
+## Use a single component for the same feature
+
+---
+
+<CodeSurfer>
+
+```jsx title="We are currently using at least 3 different select components"
+// Native select
+<select
+  name='shipping_state'
+  className='form-control custom'
+  onChange={props.updateAddress}
+  value={props.address.state}
+  >
+  {US_states.map((value, key) => (
+    <option key={key + 1} value={objectKeysValues(value).values[0]}>
+      {objectKeysValues(value).keys[0]}
+    </option>
+  ))}
+</select>
+
+// react-select
+<Select
+  id='corporate-input-field'
+  value={selectedCorporateAccount}
+  options={corporateAccounts}
+  onChange={onCorporateIdChange}
+  classNamePrefix='select'
+  isSearchable={true}
+  menuPlacement='auto'
+/>
+
+// SelectValidator
+<SelectValidator
+  addWrapperAroundSelect={true}
+  className='design-requests-form-input-select'
+  formGroupClassName='form-group-label-invisible'
+  value={stringifyInput(total_process_cycle_time_unit_type)}
+  options={TIME_UNITS}
+  placeholderOption='Unit type'
+  onChange={updateProcessCycleTimeAmountUnitType}
+  validators={requiredValidatorWithMessage.validators}
+  errorMessages={requiredValidatorWithMessage.errorMessages}
+  label='Unit type'
+/>
+```
+
+</CodeSurfer>
+
+---
+
+<TextBlock>
+
+If we really need those 3 components because they offer different functionalities,
+we should write a common interface for them.
+
+<Steps>
+    <div>Based on the provided properties it would render the relevant
+    abstracted component.</div>
+
+    Doing so will make life easier for new developers as they won't have
+    to guess what's the best practice.
+</Steps>
+
+</TextBlock>
+
+---
+
+<TextBlock margin={10}>
+
+## If your component state is managed by a parent component and has a lot of properties, build an object containing those managed properties.
+
+</TextBlock>
+
+---
+
+<CodeSurfer>
+
+```jsx title="Properties used by the child component"
+export interface PdfQuoteModalShippingAddressData {
+  readonly address: ShippingAddress
+  readonly saveShippingAddress: boolean
+  readonly isAdminFeatureEnabled: boolean
+  readonly selectedCorporateAccountId?: string
+  readonly behalfEmail: string
+  readonly behalfName: string
+}
+
+interface Props {
+  readonly data: PdfQuoteModalShippingAddressData
+  readonly onDataChange: (data: PdfQuoteModalShippingAddressData) => void
+}
+
+const PdfQuoteModalShippingAddress: React.FC<Props> = ({
+...
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```jsx title="The parent component"
+const PdfQuoteModal: React.FC<Props> = ({}) => {
+  const [
+    pdfQuoteModalShippingAddressData,
+    setPdfQuoteModalShippingAddressData
+  ] = useState<PdfQuoteModalShippingAddressData>({
+    address: addressProp,
+    saveShippingAddress: true,
+    isAdminFeatureEnabled: false,
+    behalfName: '',
+    behalfEmail: ''
+  })
+}
+
+return (
+  <PdfQuoteModalShippingAddress
+    data={pdfQuoteModalShippingAddressData}
+    onDataChange={data => setPdfQuoteModalShippingAddressData(data)}
+    ...
+  />
+)
+```
+
+</CodeSurfer>
+
+---
+
+<TextBlock margin={10}>
+
+## Implementing those concepts will make code easier to navigate, reduce boiler plate and help us develop faster.
+
+</TextBlock>
+
+---
+
+## Thank you for listening :)
+
+import { ProgressBar } from "./components/ProgressBar";
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>

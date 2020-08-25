@@ -1,0 +1,30 @@
+{
+  "name": "presentations",
+  "version": "1.0.0",
+  "description": "A repository containing documents of my presentations.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "code-surfer": "^3.1.1",
+    "mdx-deck": "^4.1.1",
+    "prettier": "^2.0.5"
+  },
+  "scripts": {
+    "start": "mdx-deck src/consistency-is-key.mdx",
+    "build": "mdx-deck build src/consistency-is-key.mdx",
+    "test": "echo \"there are no tests\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yann510/presentations.git"
+  },
+  "keywords": [
+    "presentations"
+  ],
+  "author": "Yann Thibodeau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yann510/presentations/issues"
+  },
+  "homepage": "https://github.com/yann510/presentations#readme"
+}
