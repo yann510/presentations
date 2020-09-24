@@ -1,0 +1,238 @@
+import { CodeSurfer } from "code-surfer";
+import { github, vsDark } from "@code-surfer/themes";
+import { TextBlock } from "./components/TextBlock";
+import "prismjs/components/prism-ruby"
+
+export const theme = vsDark;
+
+<TextBlock margin={20}>
+
+# Readability will make your eyes proud
+
+</TextBlock>
+
+---
+
+# Make your code breath through line breaks
+
+---
+
+<CodeSurfer>
+
+```ruby
+def calculate_subtotal(cart_totals)
+  if cart_totals.nil? || cart_totals[:item_total].nil? || cart_totals[:promo_discount].nil? || cart_totals[:corporate_account_discount].nil? || cart_totals[:shipping_total].nil?
+    raise CustomError.new(message: "cannot calculate subtotal, missing required fields")
+  end
+  cart_totals[:subtotal] = cart_totals[:item_total] - cart_totals[:promo_discount] - cart_totals[:corporate_account_discount] + cart_totals[:shipping_total] + cart_totals[:cart_service_fee]
+  cart_totals[:subtotal] = 0 if cart_totals[:subtotal] < 0
+  cart_totals
+end
+```
+
+```ruby 1:10
+def calculate_subtotal(cart_totals)
+  if cart_totals.nil? || cart_totals[:item_total].nil? || cart_totals[:promo_discount].nil? || cart_totals[:corporate_account_discount].nil? || cart_totals[:shipping_total].nil?
+    raise CustomError.new(message: "cannot calculate subtotal, missing required fields")
+  end
+
+  cart_totals[:subtotal] = cart_totals[:item_total] - cart_totals[:promo_discount] - cart_totals[:corporate_account_discount] + cart_totals[:shipping_total] + cart_totals[:cart_service_fee]
+  cart_totals[:subtotal] = 0 if cart_totals[:subtotal] < 0
+
+  cart_totals
+end
+```
+
+</CodeSurfer>
+
+---
+
+# Code simplification
+
+---
+
+<CodeSurfer>
+
+```ruby
+def calculate_subtotal(cart_totals)
+  if cart_totals.nil? || cart_totals[:item_total].nil? || cart_totals[:promo_discount].nil? || cart_totals[:corporate_account_discount].nil? || cart_totals[:shipping_total].nil?
+    raise CustomError.new(message: "cannot calculate subtotal, missing required fields")
+  end
+
+  cart_totals[:subtotal] = cart_totals[:item_total] - cart_totals[:promo_discount] - cart_totals[:corporate_account_discount] + cart_totals[:shipping_total] + cart_totals[:cart_service_fee]
+  cart_totals[:subtotal] = 0 if cart_totals[:subtotal] < 0
+
+  cart_totals
+end
+```
+
+```ruby
+def calculate_subtotal(cart_totals)
+  has_missing_totals = cart_totals&[:item_total].nil? || cart_totals&[:shipping_total].nil?
+  has_missing_discounts = cart_totals&[:promo_discount].nil? || cart_totals&[:corporate_account_discount].nil?
+
+  raise CustomError.new(message: "cannot calculate subtotal, missing required fields") if has_missing_totals || has_missing_discounts
+
+  total_costs = cart_totals[:item_total] + cart_totals[:shipping_total] + cart_totals[:cart_service_fee]
+  total_discounts = cart_totals[:promo_discount] - cart_totals[:corporate_account_discount]
+  subtotal = total_costs - total_discounts
+
+  cart_totals[:subtotal] = subtotal < 0 ? 0 : subtotal
+
+  cart_totals
+end
+```
+
+</CodeSurfer>
+
+---
+
+## As you've noticed, smaller isn't always better
+
+---
+
+# Deep nesting should be avoided
+
+---
+
+<CodeSurfer>
+
+```ruby
+def find_allowable_credit_amount
+  @total_referral_credit_earned ||= @purchasing_user.credits.where(campaign: 'referral').reduce(0){|memo,credit|memo += credit.amount}
+  @rest_of_credits ||= @purchasing_user.credits.where.not(campaign: 'referral').reduce(0){|memo,credit|memo += credit.amount}
+  @five_precent_of_cart_item_total ||= (@cart_totals[:pre_credit_total] * 0.05).round(2)
+
+  if (@total_referral_credit_earned < @five_precent_of_cart_item_total)
+    if @cart_totals[:pre_credit_total] >= (@rest_of_credits + @total_referral_credit_earned)
+      return @rest_of_credits + @total_referral_credit_earned
+    else
+      return @cart_totals[:pre_credit_total]
+    end
+  elsif (@total_referral_credit_earned > @five_precent_of_cart_item_total)
+    if @cart_totals[:pre_credit_total] < (@rest_of_credits + @five_precent_of_cart_item_total)
+      return @cart_totals[:pre_credit_total]
+    else
+      return @rest_of_credits + @five_precent_of_cart_item_total
+    end
+  end
+end
+```
+
+```ruby
+def find_allowable_credit_amount
+  @non_referral_credits ||= @purchasing_user.credits.where.not(campaign: 'referral').reduce(0) { |memo, credit| memo += credit.amount }
+
+  @referral_credits ||= @purchasing_user.credits.where(campaign: 'referral').reduce(0) { |memo, credit| memo += credit.amount }
+  @five_precent_of_cart_item_total ||= (@cart_totals[:pre_credit_total] * 0.05).round(2)
+  usable_referral_credits = [@referral_credits, @five_precent_of_cart_item_total].min
+
+  total_usable_credits = @non_referral_credits + usable_referral_credits
+
+  if @cart_totals[:pre_credit_total] > total_usable_credits
+    return total_usable_credits
+  end
+
+  @cart_totals[:pre_credit_total] < 0 ? 0 : @cart_totals[:pre_credit_total]
+end
+```
+
+</CodeSurfer>
+
+---
+
+# Avoid acronyms
+
+---
+
+<CodeSurfer>
+
+```javascript
+switchTab(key) {
+    let step
+    switch (key) {
+      case 'c': // cart
+        step = 1
+        break
+      case 'd': // delivery
+        step = 2
+        break
+      case 'p': // payment_info
+        step = 4
+        break
+      case 'o': // order_review
+        step = 5
+        break
+      default:
+        step = null
+    }
+}
+```
+
+```javascript
+switchTab(key) {
+    let step
+    switch (key) {
+      case 'cart':
+        step = 1
+        break
+      case 'delivery':
+        step = 2
+        break
+      case 'payment_info':
+        step = 4
+        break
+      case 'order_review':
+        step = 5
+        break
+      default:
+        step = null
+    }
+}
+```
+
+</CodeSurfer>
+
+---
+
+# Use operators to reduce code
+
+---
+
+<CodeSurfer>
+
+```ruby
+PartnerPayoutTransaction.new(
+    partner_payout_id: next_payout.id,
+    partner_part_order_fulfillment_id: transaction.partner_part_order_fulfillment_id,
+    total: transaction.total,
+    vention_fees: transaction.vention_fees,
+    status: 'delayed',
+    is_snapshot: false,
+    delayed_from_payout_id: transaction.delayed_from_payout_id || transaction.partner_payout_id
+  ).save
+```
+
+```ruby
+PartnerPayoutTransaction.new(
+    **transaction,
+    partner_payout_id: next_payout.id,
+    status: 'delayed',
+    is_snapshot: false,
+    delayed_from_payout_id: transaction.delayed_from_payout_id || transaction.partner_payout_id
+  ).save
+```
+
+</CodeSurfer>
+
+---
+
+## Thank you for listening :)
+
+import { ProgressBar } from "./components/ProgressBar";
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>
