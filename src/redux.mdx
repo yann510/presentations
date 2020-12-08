@@ -1,0 +1,237 @@
+import { CodeSurfer } from "code-surfer";
+import { github, vsDark } from "@code-surfer/themes";
+import { TextBlock } from "./components/TextBlock";
+import "prismjs/components/prism-ruby";
+
+export const theme = vsDark;
+
+<TextBlock margin={20}>
+
+# The things you should know about Redux
+
+</TextBlock>
+
+---
+
+# What is Redux?
+
+---
+
+### Redux is a predictable state container
+
+<ul>
+  <Steps>
+    <li>Helps you write applications that behave consistently</li>
+    <li>Centralizes your application state to avoid property drilling</li>
+    <li>Makes it easy to track and reproduce bugs as the application state is contained in a single place</li>
+  </Steps>
+</ul>
+
+---
+
+# Why should I use Redux?
+
+---
+
+<TextBlock margin={15} style={{ display: "grid" }}>
+
+To avoid property drilling.
+
+<img
+  src="https://christiankohler.net/static/e23cc4a6c42df7ff0e07afdc3080ace5/8e47a/PropDrilling.png"
+  style={{ width: "auto", height: "auto", justifySelf: "center" }}
+/>
+
+</TextBlock>
+
+---
+
+Here is how Redux solves this issue
+
+<img
+  src="https://christiankohler.net/static/8a86179f330d0fe592e5fd963af9a926/4cac5/ProvideInject.webp"
+  style={{ width: "auto", height: "auto", justifySelf: "center" }}
+/>
+
+---
+
+# How does Redux work?
+
+---
+
+<img
+  src="https://miro.medium.com/max/919/1*EdiFUfbTNmk_IxFDNqokqg.png"
+  style={{ width: "auto", height: "auto", justifySelf: "center" }}
+/>
+
+---
+
+## What is an action?
+
+<ul>
+  <Steps>
+    <li>An action describes something that happens in the application</li>
+    <li>An action can perform a call to an API, store data on the local storage, etc</li>
+    <li>An action will produce a side effect</li>
+  </Steps>
+</ul>
+
+---
+
+## What is a reducer?
+
+<ul>
+  <Steps>
+    <li>A reducer is a pure function that will return a new state for the application</li>
+  </Steps>
+</ul>
+
+---
+
+## What is a store?
+
+<ul>
+  <Steps>
+    <li>A store is an object that will hold the state of our application</li>
+    <li>A store receives state updates from the reducers</li>
+  </Steps>
+</ul>
+
+---
+
+# Code example - TODO application
+
+---
+
+<CodeSurfer>
+
+```javascript title="Actions"
+import * as types from '../constants/ActionTypes'
+
+export const addTodo = text => ({ type: types.ADD_TODO, payload => {
+    // Perform network call...
+
+    return insertedTodo
+})
+```
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```javascript title="Reducers"
+export default function todoReducers(state = initialState, action) {
+  switch (action.type) {
+    case ADD_TODO:
+      return [
+        ...state,
+        {
+          todos: [...state.todos, action.payload]
+        }
+      ]
+  }
+}
+```
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```javascript title="Store"
+import { combineReducers } from 'redux'
+import todoReducers from './todos'
+
+const store = createStore(combineReducers({ todos: todoReducers }))
+
+export default rootReducer
+```
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```javascript title="Using everything"
+const todos = useSelector(state => state.todos)
+const dispatch = useDispatch()
+
+// Will log 0 on first render
+// Will log 1 on second render
+console.log(todos.length)
+
+useEffect(() => {
+  dispatch(addTodo(todo))
+}, [])
+```
+</CodeSurfer>
+
+---
+
+# How can this help us?
+
+---
+
+<CodeSurfer>
+
+```javascript title="By avoiding this"
+<Payment
+  currentUserId={this.props.current_user_id}
+  promo_code={this.state.promo_code}
+  checkCreditAndApply={this.checkCreditAndApply}
+  showTaxField={true}
+  tax_id={this.state.tax_id}
+  checkPromoCodeAndApply={this.checkPromoCodeAndApply}
+  checkoutData={this.checkoutData}
+  setPromoCode={this.setPromoCode}
+  setToken={this.setToken}
+  setPONumber={this.setPONumber}
+  setPOFile={this.setPOFile}
+  setTaxId={this.setTaxId}
+  setPaymentMethod={this.setPaymentMethod}
+  setUsedCredit={this.setUsedCredit}
+  previousTab={this.switchTab.bind(this, 's')}
+  nextTab={this.switchToReviewTab}
+  corporate_accounts={this.props.corporate_accounts}
+  updatePaymentOptionsCallback={this.updatePaymentOptionsCallback}
+  paymentOptions={this.state.payment_options}
+  shippingCountry={this.checkoutData.shippingAddress.country}
+  pickupDate={
+    this.state.shipping_options[
+      this.state.selected_shipping_option_index
+    ].pickup_date
+  }
+  estimatedDeliveryDate={
+    this.checkoutData.shippingDetails.estimated_delivery_date
+  }
+  is_admin={this.props.is_admin}
+  setCartTotals={this.setCartTotals}
+  corporateAccountId={this.state.corporateAccountId}
+/>
+```
+</CodeSurfer>
+
+---
+
+# Conclusion
+
+<ul>
+  <Steps>
+    <li>Using redux would reduce the number of bugs caused by state management issues</li>
+    <li>It would also speed up the development time and especially maintenance time</li>
+    <li>Redux would make our lives easier, thus we would all be happier :=)</li>
+  </Steps>
+</ul>
+
+---
+
+## Thank you for listening :)
+
+import { ProgressBar } from "./components/ProgressBar";
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>
