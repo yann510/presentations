@@ -1,0 +1,179 @@
+import { ProgressBar } from "../components/ProgressBar";
+import { TextBlock } from "../components/TextBlock";
+import { ImageColumns } from "../components/ImageColumns";
+import { Quote } from "../components/Quote";
+import { Bold } from "../components/Bold";
+import { CodeSurfer } from "code-surfer";
+import { github, vsDark } from "@code-surfer/themes";
+
+export const theme = vsDark;
+
+<TextBlock margin={20}>
+
+# Should we use a design system?
+
+</TextBlock>
+
+---
+
+# What is a design system?
+
+---
+
+<TextBlock margin={10}>
+
+## A design system is a collection of reusable components, guided by clear standards, that can be assembled together to build any number of applications.
+
+</TextBlock>
+
+---
+
+<img src="https://i.guim.co.uk/img/media/f372225128789883b3e2daaf123805b3b8325952/0_389_4453_2671/master/4453.jpg?width=1200&quality=85&auto=format&fit=max&s=d3a41b6957b2a7a72fc4b16de9b561ba" />
+
+---
+
+<TextBlock margin={10}>
+
+## Why would I spend time developing a design system?
+
+<ul>
+  <Steps>
+    <li>Consistent branding in every section of the website</li>
+    <li>Designer and developer communication is improved</li>
+    <li>Code re-usability is greatly enhanced by using consistent developing patterns</li>
+    <li>Development time of frontend tasks are greatly reduced as components behaviours are predictable</li>
+  </Steps>
+</ul>
+
+</TextBlock>
+
+---
+
+# Vention design inconsistencies examples
+
+---
+
+# Cards
+
+import card1 from "./card-1.png";
+import card2 from "./card-2.png";
+
+<ImageColumns columns={2} images={[card1, card2]} imageWidth={350} imageHeight={600} />
+
+---
+
+# Inputs
+
+import input1 from "./input-1.png";
+import input2 from "./input-2.png";
+
+<ImageColumns images={[input1, input2]} imageWidth={600} imageHeight={100} />
+
+---
+
+# Buttons
+
+import button1 from "./button-1.png";
+import button2 from "./button-2.png";
+import button3 from "./button-3.png";
+
+<ImageColumns images={[button1, button2, button3]} />
+
+---
+
+# Selects
+
+import select1 from "./select-1.png";
+import select2 from "./select-2.png";
+
+<ImageColumns images={[select1, select2]} />
+
+---
+
+<TextBlock margin={10}>
+
+## According to my experience at previous companies, having a design system increased development speed of at least 25%
+
+</TextBlock>
+
+---
+
+<TextBlock margin={10}>
+
+# Don't take my word for it
+
+<div style={{ display: "grid", gridGap: 20 }}>
+  <div>
+    Justin Baker from UX Collective{" "}
+    <a href="https://uxdesign.cc/the-designers-guide-to-design-system-roi-success-16856038dd4d">confirms</a> this number
+    and here's why:
+  </div>
+  <Quote>
+    With an effective design system, designers can focus on crafting new and innovative customer experiences using
+    systematized building blocks and established patterns.
+  </Quote>
+  <div>
+    According to{" "}
+    <a href="https://uxdesign.cc/the-roi-of-design-systems-the-what-why-who-and-how-1392d02f80e5">Pete Sena</a> from
+    Force-multiplier, while providing speed, it also provides:
+  </div>
+  <Quote>
+    a consistent brand standard, a predictable and delightful brand experience, and employee collaboration that
+    ultimately designs demand and drives long-term growth.
+  </Quote>
+</div>
+
+</TextBlock>
+
+---
+
+<TextBlock margin={10}>
+
+# Let's talk numbers
+
+<ul>
+  <Steps>
+    <li>We have ~30 developers</li>
+    <li>Out of those 30, <Bold>~20 will work on frontend code</Bold></li>
+    <li>Those 20 developers will work ~50% of the time on frontend code, so that's <Bold>10 full-time developers</Bold></li>
+    <li>Let's assume the average salary is 80k, which is <Bold>800k yearly</Bold></li>
+    <li>We would need <Bold>~20 components</Bold> to reach the aforementioned <Bold>25% speed increase</Bold></li>
+    <li>Developing a component takes <Bold>~5 days</Bold></li>
+    <li>Developing those components will take <Bold>~100 days and cost ~22k</Bold></li>
+    <li>After this initial investment, we would enjoy a <Bold>~25% speed increase</Bold> for development time, which equals to <Bold>200k yearly in extra features produced</Bold></li>
+    <li>The more developers we have, <Bold>the higher the rewards are</Bold></li>
+  </Steps>
+</ul>
+
+</TextBlock>
+
+---
+
+<TextBlock margin={10}>
+
+# This is just the beginning
+
+<ul>
+  <Steps>
+    <li>We can then build on top of that and provide examples of our best practices of common recipes.</li>
+    <li>Eg: how do you build a form, how do you build a modal, how do you build tabs, etc</li>
+    <li>Those would not only showcase best practices, but would serve as an amazing source for documentation</li>
+    <li>This would also reduce the number of recipes we have for the same pattern and thus make the code easier to read wherever you are</li>
+  </Steps>
+</ul>
+
+</TextBlock>
+
+---
+
+# What are your thoughts?
+
+---
+
+## Thank you for listening :)
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>
