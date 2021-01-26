@@ -1,0 +1,569 @@
+import { ProgressBar } from "./components/ProgressBar";
+import { TextBlock } from "./components/TextBlock";
+import { ImageColumns } from "./components/ImageColumns";
+import { Bold } from "./components/Bold";
+import { CodeSurfer } from "code-surfer";
+import { github, vsDark } from "@code-surfer/themes";
+
+export const theme = vsDark;
+
+# Rvest - Code
+
+---
+
+## Backend
+
+---
+
+<CodeSurfer>
+
+```ts title="user.entity.ts"
+@Entity()
+export class User extends RootEntity {
+  @IsNotEmpty()
+  @IsEmail()
+  @Index({ unique: true })
+  @Column("text", { nullable: false })
+  email: string
+
+  @IsNotEmpty()
+  @Column("boolean", { nullable: false })
+  isAdmin = false
+
+  @OneToOne(() => WealthSimpleAccount, wealthSimpleAccount => wealthSimpleAccount.user, {
+    eager: true,
+    cascade: true,
+  })
+  wealthSimpleAccount: WealthSimpleAccount
+
+  @OneToMany(() => Order, order => order.user, { cascade: true })
+  orders: Order[]
+
+  @OneToMany(() => ActiveStrategy, activeStrategy => activeStrategy.user, { eager: true, cascade: true })
+  activeStrategies: ActiveStrategy[]
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="users.service.ts"
+@Injectable()
+export class UsersService {
+  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+
+  async getTradingUsers() {
+    const users = await this.userRepository.find()
+
+    return users.filter(
+      user => user.activeStrategies?.some(activeStrategy => activeStrategy.active) && user.wealthSimpleAccount
+    )
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="users.controller.ts"
+@ApiTags("users")
+@Controller("users")
+@UseGuards(PasswordLessAuthGuard)
+export class UsersController {
+  constructor(private usersService: UsersService) {}
+
+  @Post("invite")
+  @ApiOperation({ summary: "Invite a user to Rvest as an admin" })
+  @ApiResponse({ status: StatusCodes.CREATED, type: User })
+  async inviteUser(@Request() req: UserRequest, @Body() body: EmailRequestBody) {
+    return await this.usersService.adminInvite(req.user, body.email)
+  }
+
+  @Get("self")
+  @ApiOperation({ summary: "Get the current logged in user" })
+  @ApiResponse({ status: StatusCodes.OK, type: User })
+  async getSelf(@Request() req: UserRequest) {
+    return req.user
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="users.module.ts"
+@Module({
+  imports: [TypeOrmModule.forFeature([User]), OrdersModule, WealthSimpleModule],
+  providers: [UsersService, WealthSimpleService],
+  exports: [UsersService, WealthSimpleService],
+  controllers: [UsersController],
+})
+export class UsersModule {}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="users.service.spec.ts"
+describe("UsersService", () => {
+  let testingHelper: TestingHelper
+  let service: UsersService
+
+  beforeAll(async done => {
+    testingHelper = await new TestingHelper().initializeModuleAndApp("users", [UsersModule])
+
+    service = testingHelper.module.get(UsersService)
+    done()
+  })
+
+  afterAll(async done => {
+    await testingHelper.shutdownServer()
+    done()
+  })
+
+  it("should be defined", () => {
+    expect(service).toBeDefined()
+  })
+})
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```yml title="Test fixtures"
+entity: Order
+items:
+  order1:
+    wealthSimpleOrderId: 1
+    type: buy
+    status: filled
+    symbol: AAXJ
+    unitPrice: 50
+    quantity: 18
+    totalPrice: 900
+    currencyCode: CAD
+    user: '@user2'
+    activeStrategy: '@activeStrategy2'
+    createdAt: 12-19-2020 09:30:00.1
+
+  order2:
+    wealthSimpleOrderId: 2
+    type: sell
+    status: filled
+    symbol: AAXJ
+    unitPrice: 55
+    quantity: 18
+    totalPrice: 990
+    currencyCode: CAD
+    user: '@user2'
+    activeStrategy: '@activeStrategy2'
+    createdAt: 12-21-2020 09:30:00.1
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="iex-cloud.worker.ts"
+@Injectable()
+export class IexCloudWorker {
+  private readonly logger = new Logger(IexCloudWorker.name)
+
+  constructor(private iexCloudService: IexCloudService, private etfService: EtfService) {
+    this.logger.log("Starting iex-cloud worker")
+  }
+
+  private _stockHistoryEntryBySymbol: StockHistoryEntryBySymbol
+  get stockHistoryEntryBySymbol(): StockHistoryEntryBySymbol {
+    return this._stockHistoryEntryBySymbol
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async updateLivePrices() {
+    this.logger.debug("Updating live prices")
+
+    try {
+      const symbols = [...new Set(await this.etfService.getTopPerformingEtfSymbolsForAllRanges())]
+      const stocks = await this.etfService.getStocks(symbols)
+      if (!stocks.length) {
+        return
+      }
+
+      const results = await this.iexCloudService.getBatchStockInfo(stocks)
+      this._stockHistoryEntryBySymbol = Object.keys(results).reduce((container, symbol) => {
+        const quote = results[symbol].quote
+        const minute = dayjs().minute() - (dayjs().minute() % 10)
+        const date = dayjs().minute(minute).second(0).millisecond(0)
+
+        return {
+          ...container,
+          [symbol]: {
+            price: getQuotePrice(quote),
+            timestamp: date.valueOf(),
+            date: date.format(dateFormat),
+            minute: date.format(timeFormat),
+            symbol: quote.symbol,
+            cumulatedChangePercentage: liveDataChangePercentage,
+          },
+        }
+      }, {} as StockHistoryEntryBySymbol)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+## Frontend
+
+---
+
+<CodeSurfer>
+
+```jsx title="login-page.tsx"
+export const LoginPage: React.FC<Props> = () => {
+  const classes = useLoginPageStyles()
+  const dispatch = useDispatch<AppDispatch>()
+  const history = useHistory()
+  const email = new URLSearchParams(history.location.search).get("email")
+  const token = new URLSearchParams(history.location.search).get("token")
+  const [, setEmailLocalStorage] = useLocalStorage("email", null)
+  const [, setTokenLocalStorage] = useLocalStorage("token", null)
+
+  useEffect(() => {
+    if (email && token) {
+      dispatch(authThunks.validateToken({ query: { email, token } })).then(response => {
+        if (response.type.includes("fulfilled")) {
+          dispatch(snackbarThunks.display({ message: "Login successful", severity: "success" }))
+
+          setEmailLocalStorage(email)
+          setTokenLocalStorage(token)
+          apiClient.defaults.headers.email = email
+          apiClient.defaults.headers.token = token
+
+          history.push(applicationRoutes.trading.to)
+        }
+      })
+    }
+  }, [dispatch, email, token])
+
+  return (
+    <div className={classes.container}>
+      <PaperTile className={classes.paper}>
+        <LoginForm />
+      </PaperTile>
+    </div>
+  )
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```jsx title="login-form.tsx"
+export const LoginForm: React.FC<Props> = props => {
+  const [user, setUser] = useState(new User())
+  const { validateForm, errorsByProperty } = useFormValidator(User)
+  const dispatch = useDispatch<AppDispatch>()
+  const authState = useSelector<RootState, AuthState>((state: RootState) => state.authReducer)
+
+  const onSubmit = async event => {
+    event.preventDefault()
+
+    const isValid = await validateForm(user)
+    if (isValid) {
+      const response = await dispatch(authThunks.requestToken({ data: { email: user.email } }))
+      if (isSuccess(response)) {
+        dispatch(snackbarThunks.display({ message: "Go check your email for validation link", severity: "info" }))
+      }
+    }
+  }
+
+  return (
+    <Form onSubmit={onSubmit} title="Login" loadingButtonText="Login" isSubmitting={authState.status.post.loading}>
+      <TextField
+        id="email"
+        label="Email"
+        value={user.email || ""}
+        onChange={event => setUser({ ...user, email: event.target.value })}
+        variant={"outlined"}
+        error={!!errorsByProperty["email"]}
+        helperText={errorsByProperty["email"]}
+        FormHelperTextProps={helperTextProps}
+      />
+    </Form>
+  )
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="user-thunks-slice.ts"
+export interface UserState extends SliceState<User> {
+  status: Pick<SliceState<User>["status"], "get">
+}
+
+const getSelfThunkReducer = thunkReducerGetFactory("users/self")
+
+export const usersSlice = createSlice({
+  name: "users",
+  initialState: getInitialSliceState<UserState>(),
+  reducers: {},
+  extraReducers: {
+    ...getSelfThunkReducer.reducers,
+  },
+})
+export const userThunks = {
+  getSelf: getSelfThunkReducer.thunk,
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```ts title="user-reducer-factory.ts"
+export const thunkReducerGetFactory = <
+  TSliceState extends SliceState<RootEntity>,
+  TRequestParams = unknown,
+  TRequestQuery = unknown
+>(
+  urlPath: UrlPath<TRequestParams>,
+  onFulfilled?: (state: TSliceState, action: PayloadAction<StateEntityType<TSliceState>>) => void
+) => {
+  const thunk = createAsyncThunk(
+    `${urlPath}/get`,
+    async (request: { params?: TRequestParams; query?: TRequestQuery; config?: AxiosRequestConfig }) => {
+      const url = typeof urlPath === "function" ? urlPath(request.params) : urlPath
+      const config: AxiosRequestConfig = { ...request.config, params: { ...request.query } }
+
+      return await handleRequest(apiClient.get<StateEntityType<TSliceState>>(url, config))
+    }
+  )
+
+  return {
+    thunk,
+    reducers: {
+      ...pendingReducer(thunk, "get"),
+      ...rejectedReducer(thunk, "get"),
+      [thunk.fulfilled.toString()]: (
+        state: TSliceState,
+        action: PayloadAction<StateEntityType<TSliceState>, string, { arg: StateEntityType<TSliceState> }>
+      ) => {
+        if (onFulfilled) {
+          onFulfilled(state, action)
+        } else {
+          const entities = [...state.entities]
+          const index = entities.findIndex(entity => entity.id === action.payload.id)
+          if (index === -1) {
+            entities.push(action.payload)
+          } else {
+            entities[index] = action.payload
+          }
+          state.entities = entities
+        }
+        state.status.get.ids[action.meta.arg.id] = false
+      },
+    },
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+# Deployment
+
+---
+
+<CodeSurfer>
+
+```yml title="Digital Ocean"
+name: rvest
+
+domains:
+  - domain: www.rvest.cash
+    type: PRIMARY
+
+static_sites:
+  - name: webapp
+    environment_slug: html
+    github:
+      repo: chocolat-chaud-io/rvest
+      branch: master
+      deploy_on_push: true
+    build_command: npm run build webapp -- --prod
+    output_dir: /dist/apps/webapp
+    routes:
+      - path: /
+
+services:
+  - name: api
+    environment_slug: node-js
+    github:
+      repo: chocolat-chaud-io/rvest
+      branch: master
+      deploy_on_push: true
+    build_command: npm run remap-redoc && npm run build api -- --prod
+    run_command: node dist/apps/api/main.js
+    http_port: 3333
+    envs:
+      - key: API_URL
+        value: ${_self.PUBLIC_URL}
+      - key: WEBAPP_URL
+        value: ${webapp.PUBLIC_URL}
+      - key: DATABASE_HOST
+        value: ${database.HOSTNAME}
+      - key: DATABASE_PORT
+        value: ${database.PORT}
+      - key: DATABASE_NAME
+        value: ${database.DATABASE}
+      - key: DATABASE_USERNAME
+        value: ${database.USERNAME}
+      - key: DATABASE_PASSWORD
+        value: ${database.PASSWORD}
+      - key: DATABASE_CA_CERT
+        value: ${database.CA_CERT}
+      - key: TZ
+        value: America/New_York
+    routes:
+      - path: /do
+    health_check:
+      initial_delay_seconds: 60
+      period_seconds: 300
+      timeout_seconds: 30
+      success_threshold: 1
+      failure_threshold: 3
+      http_path: /do/api/health
+    cors:
+      allow_origins:
+        - regex: .*
+
+databases:
+  - name: database
+    engine: PG
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```yml title="GitHub"
+name: rvest CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.13.1]
+
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Increase watcher limit
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set head
+        run: sh .github/scripts/get-head.sh >> $GITHUB_ENV
+        env:
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          MERGE_HEAD: ${{ github.event.after }}
+
+      - name: Set base
+        run: sh .github/scripts/get-base.sh >> $GITHUB_ENV
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          MERGE_BASE: ${{ github.event.before }}
+
+      - name: Setup postgres container
+        run: docker-compose -f $GITHUB_WORKSPACE/apps/database/postgres/docker-compose.yml up -d
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install npm packages
+        run: npm i
+
+      - name: Lint files
+        run: npm run affected:lint -- --base=$BASE --head=$HEAD
+
+      - name: Enforce naming conventions
+        run: npm run lint:file-folder-convention
+
+      - name: Build affected apps
+        run: npm run affected:build -- --base=$BASE --head=$HEAD
+
+      - name: Start api
+        run: npm start api
+```
+
+```yml title="nx"
+- name: Lint files
+  run: npm run affected:lint -- --base=$BASE --head=$HEAD
+
+- name: Build affected apps
+  run: npm run affected:build -- --base=$BASE --head=$HEAD
+```
+
+</CodeSurfer>
+
+---
+
+## Thank you for listening :)
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>
