@@ -1,0 +1,262 @@
+import { ProgressBar } from "../components/ProgressBar";
+import { TextBlock } from "../components/TextBlock";
+import { CodeBlock } from "../components/CodeBlock";
+import { ImageColumns } from "../components/ImageColumns";
+import { CodeSurfer } from "code-surfer";
+import { vsDark } from "@code-surfer/themes";
+
+export const theme = vsDark;
+
+# Stimulus
+
+---
+
+## What is Stimulus?
+
+---
+
+<TextBlock>
+  It's a framework that promises to bring back simplicity to server side rendering while behaving like a modern reactive
+  application.
+</TextBlock>
+
+---
+
+## Let's dive right away into code
+
+---
+
+<CodeSurfer>
+
+```html title="Example"
+<div data-controller="clipboard">
+  PIN: <input data-clipboard-target="source" type="text" value="1234" />
+  <button data-action="clipboard#copy">Copy to Clipboard</button>
+</div>
+```
+
+</CodeSurfer>
+
+---
+
+### As you can see...
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>Stimulus doesn't try to create the HTML, it attaches itself to an existing document.</li>
+      <li>It is a way to organize your JavaScript for SSR in an elegant and re-usable way.</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Controllers
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>Controllers are used to enhance HTML with JavaScript.</li>
+      <li>
+        They can be found in the HTML under the <strong>data-controller</strong> attribute:{" "}
+        <CodeBlock language="xml" codeString='<div data-controller="clipboard" />' />
+      </li>
+      <li>
+        This HTML attribute will link the JS controller:{" "}
+        <CodeBlock
+          language="javascript"
+          codeString={`// src/controllers/clipboard_controller.js\nimport { Controller } from "stimulus"\n\nexport default class extends Controller {\ncopy() {\n   ...\n }\n}`}
+        />
+      </li>
+      <li>
+        Stimulus will look at all <strong>data-controller</strong> attributes for a corresponding controller class,
+        creates a new instance of it and connects it to the element.
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+### Lifecycle callbacks
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        They are special methods that allow you to respond whenever a controller connect and disconnects from the
+        document.
+      </li>
+      <li>There are 3 available methods:</li>
+      <li>
+        <strong>initialize()</strong>: happens only once when the the controller is first instantiated.
+      </li>
+      <li>
+        <strong>connect()</strong>: anytime the controller is connected to the DOM
+      </li>
+      <li>
+        <strong>disconnect()</strong>: anytime the controller is disconnected from the DOM
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Actions
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>Actions are used to sprinkle JS interactivity where needed.</li>
+      <li>
+        They can be found in the HTML under the <strong>data-action</strong> attribute.
+      </li>
+      <li>
+        They have the following syntax:{" "}
+        <CodeBlock language="xml" codeString='<button data-action="event->controller_name#method_name" />' />
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+import actionDefaultEvents from "./action-default-events.png";
+
+### Default action events
+
+<ImageColumns images={[actionDefaultEvents]} />
+
+---
+
+## Targets
+
+<ul>
+  <Steps>
+    <li>
+      Targets let you reference important elements by name:{" "}
+      <CodeBlock language="xml" codeString='<input data-clipboard-target="source" type="text" value="1234" />' />
+    </li>
+    <li>
+      In the controller you define them under the static property <strong>targets</strong>:{" "}
+      <CodeBlock language="javascript" codeString='static targets = ["source"]' />
+    </li>
+    <li>
+      Stimulus will add properties to your controller so you can work with them:{" "}
+      <CodeBlock
+        language="javascript"
+        codeString={`// Returns the first target element from the dom\nthis.sourceTarget\n\n// Returns all matching targets\nthis.sourceTargets`}
+      />
+    </li>
+  </Steps>
+</ul>
+
+---
+
+## Values
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        You can read and write HTML data attributes on controller elements as typed values using special controller
+        properties.
+      </li>
+      <li>
+        <CodeBlock language="xml" codeString='<div data-controller="loader" data-loader-url-value="/messages">' />{" "}
+      </li>
+      <li>
+        <CodeBlock
+          language="javascript"
+          codeString={`export default class extends Controller {\n  static values = { url: String }\n\n  connect() {\n    fetch(this.urlValue).then(/* … */)\n  }\n}`}
+        />{" "}
+      </li>
+      <li>
+        Value can have different types (<strong>Array</strong>, <strong>Boolean</strong>, <strong>Number</strong>,{" "}
+        <strong>Object</strong>, <strong>String</strong>) which will determine how they are serialized to the HTML.
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Values part 2
+
+import valueGeneratedProperties from "./values-generated-properties.png";
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        Stimulus will generate properties and attributes for you: <ImageColumns images={[valueGeneratedProperties]} />
+      </li>
+      <li>
+        You can also watch for property changes using the change callback:{" "}
+        <CodeBlock language="javascript" codeString={`urlValueChanged() {\n  fetch(this.urlValue).then(/* … */)\n}`} />
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Using Stimulus with Rails
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        Install stimulus: <CodeBlock language="bash" codeString={`bundle exec rails webpacker:install:stimulus`} />
+      </li>
+      <li>
+        In <strong>application.html.erb</strong> add the following line:{" "}
+        <CodeBlock language="erb" codeString={`<%= javascript_packs_with_chunks_tag 'stimulus' %>`} />
+      </li>
+      <li>Congrats, you're now ready to go!</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Why should I use Stimulus and SSR?
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        Stimulus allows to develop server side rendered code while easily enhancing the HTML with JavaScript where
+        needed.
+      </li>
+      <li>SSR is better for SEO.</li>
+      <li>You don't need to create type definitions for your endpoints (if using TypeScript).</li>
+      <li>You are usually less tempted to create interactivity you don't need.</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Conclusion
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>You should use SSR when your page requires minimal JavaScript interactivity or SEO is important.</li>
+      <li>Using Stimulus will help you manage JS when required.</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## Thank you for listening :)
+
+<Footer>
+
+<ProgressBar />
+
+</Footer>

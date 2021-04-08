@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "description": "A repository containing documents of my presentations.",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "react-syntax-highlighter": "^15.4.3"
+  },
   "devDependencies": {
     "code-surfer": "^3.1.1",
     "mdx-deck": "^4.1.1",
     "prettier": "^2.0.5"
   },
   "scripts": {
-    "start": "mdx-deck src/rvest-code.mdx",
-    "build": "mdx-deck build src/rvest-code.mdx",
+    "start": "mdx-deck src/ruby-stimulus/ruby-stimulus.mdx",
+    "build": "mdx-deck build src/ruby-stimulus/ruby-stimulus.mdx",
     "test": "echo \"there are no tests\""
   },
   "repository": {
