@@ -1,9 +1,7 @@
 import React from "react";
 
 export const ImageColumns = (props) => {
-  const { columns } = props;
-  const { images } = props;
-  const { imageWidth, imageHeight } = props;
+  const { columns, images, imageWidth, imageHeight } = props;
   const gridTemplateColumns = [...Array(columns || 1)].map(() => "1fr").join(" ");
 
   return (

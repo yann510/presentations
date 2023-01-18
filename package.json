@@ -12,8 +12,8 @@
     "prettier": "^2.0.5"
   },
   "scripts": {
-    "start": "mdx-deck src/ruby-stimulus/ruby-stimulus.mdx",
-    "build": "mdx-deck build src/ruby-stimulus/ruby-stimulus.mdx",
+    "start": "mdx-deck src/timescaledb/timescaledb.mdx",
+    "build": "mdx-deck build src/timescaledb/timescaledb.mdx",
     "test": "echo \"there are no tests\""
   },
   "repository": {

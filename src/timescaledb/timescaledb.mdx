@@ -1,0 +1,141 @@
+import { ProgressBar } from "../components/ProgressBar";
+import { TextBlock } from "../components/TextBlock";
+import { CodeBlock } from "../components/CodeBlock";
+import { vsDark } from "@code-surfer/themes";
+
+export const theme = vsDark;
+
+# Time Series Database (TSDB)
+
+---
+
+## What is a time series database?
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>It's a database optimized for time-stamped data</li>
+      <li>
+        This could be server metrics, application performance monitoring, network data, sensor data and many other types
+        of data
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## What's the difference with other databases?
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        They perform time-stamp data storage which allows them to handle compression and data lifecycle management
+        efficiently
+      </li>
+      <li>
+        They can handle large time series scans of many records spanning many months and respond in milliseconds instead
+        of seconds
+      </li>
+      <li>
+        They can perform automatic aggregation on old data so it takes less space as precise data might become less
+        relevant after a while
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## TimescaleDB
+
+<TextBlock>
+  <ul>
+    <Steps>
+      <li>
+        It is a database that leverages Postgres and act as a plugin to support time series data within this environment
+      </li>
+      <li>
+        Some notable commands that are super useful for time series include `time_bucket()`, `time_bucket_gapfill()`,
+        `histogram()`
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+## time_bucket()
+
+This function will group data based on an interval
+
+The first parameter is the interval, the second is the timestamp
+
+<CodeBlock
+  language="sql"
+  codeString={`
+SELECT time_bucket('5 minutes', time) AS five_min ...
+`}
+/>
+
+---
+
+import timeBucketImage from "./timescaledb-time-bucket.jpg";
+
+## time_bucket() visualisation
+
+<img src={timeBucketImage} style={{ height: "80vh" }} />
+
+---
+
+## time_bucket_gapfill()
+
+<TextBlock>
+This function will group data based on an interval and also fill the gap between the specified range.
+
+The first parameter is the interval, the second is the timestamp and then you specify which range you want filled in
+the where clause
+
+  <CodeBlock
+    language="sql"
+    codeString={`
+SELECT time_bucket('5 minutes', time) AS five_min ... WHERE time > now() - INTERVAL '5 months' AND time < now()
+`}
+  />
+</TextBlock>
+
+---
+
+## histogram()
+
+<TextBlock>
+  This function will create buckets between a specified range for a given value.
+  Each bucket will contain the count of elements for the given value range of the bucket.
+
+The first parameter is the metric which you want to bucket, the second is minimum value of the bucket,
+the third is the maximum value of the bucket and the last one is the number of buckets to create.
+
+  <CodeBlock
+    language="sql"
+    codeString={`
+    SELECT device_id, histogram(battery_level, 20, 60, 5)
+`}
+  />
+</TextBlock>
+
+---
+
+import histogramImage from "./histogram.png";
+
+## histogram() visualisation
+
+<img src={histogramImage} style={{ height: "80vh" }} />
+
+---
+
+# Thank you for listening :)
+
+<Footer>
+  <ProgressBar />
+</Footer>
