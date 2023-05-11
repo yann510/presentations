@@ -12,8 +12,8 @@
     "prettier": "^2.0.5"
   },
   "scripts": {
-    "start": "mdx-deck src/timescaledb/timescaledb.mdx",
-    "build": "mdx-deck build src/timescaledb/timescaledb.mdx",
+    "start": "mdx-deck src/kubernetes/kubernetes.mdx",
+    "build": "mdx-deck build src/kubernetes/kubernetes.mdx",
     "test": "echo \"there are no tests\""
   },
   "repository": {
