@@ -3,18 +3,21 @@
   "version": "1.0.0",
   "description": "A repository containing documents of my presentations.",
   "main": "index.js",
+  "scripts": {
+    "start": "mdx-deck src/home-assistant/home-assistant.mdx --port=8002",
+    "build": "mdx-deck build src/home-assistant/home-assistant.mdx",
+    "test": "echo \"there are no tests\""
+  },
   "dependencies": {
     "react-syntax-highlighter": "^15.4.3"
+  },
+  "engines": {
+    "node": "<16"
   },
   "devDependencies": {
     "code-surfer": "^3.1.1",
     "mdx-deck": "^4.1.1",
     "prettier": "^2.0.5"
-  },
-  "scripts": {
-    "start": "mdx-deck src/kubernetes/kubernetes.mdx",
-    "build": "mdx-deck build src/kubernetes/kubernetes.mdx",
-    "test": "echo \"there are no tests\""
   },
   "repository": {
     "type": "git",

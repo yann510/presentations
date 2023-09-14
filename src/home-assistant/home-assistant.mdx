@@ -1,0 +1,304 @@
+import { CodeSurfer } from "code-surfer";
+import { vsDark } from "@code-surfer/themes";
+import { TextBlock } from "../components/TextBlock";
+import { VideoSlide } from "../components/VideoSlide";
+import { ImageSlide } from "../components/ImageSlide";
+import { ProgressBar } from "../components/ProgressBar";
+
+export const theme = vsDark;
+
+<TextBlock margin={20} style={{ textAlign: "center" }}>
+
+# IoT & Home Assistant
+
+<div style={{ color: "white" }}>Integrating the Internet of Things with Home Automation</div>
+
+</TextBlock>
+
+---
+
+### What are IoT devices?
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>
+        <b>Connected Devices</b>: that can connect to the internet and communicate with other devices.
+      </li>
+      <li>
+        <b>Examples of devices</b>: smart thermostats, lights, and security cameras.
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+### What is Home Assistant?
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>
+        <b>Open Source</b>: A free platform for home automation.
+      </li>
+      <li>
+        <b>Integration</b>: Supports thousands of devices and services.
+      </li>
+      <li>
+        <b>Customizable</b>: Can be tailored to specific needs and preferences.
+      </li>
+      <li>
+        <b>Privacy Focused</b>: Data stays in your network, not in the cloud.
+      </li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+import homeAssistantDashboardImage from "./home-assistant-dashboard.png"
+
+<ImageSlide title=" Home Assistant Dashboard" src={homeAssistantDashboardImage} />
+
+---
+
+### The Challenge of Diverse IoT Protocols
+
+<TextBlock style={{ display: "grid" }}>
+  <Steps>
+    <li><b>Interoperability Issues:</b> Devices from different manufacturers struggle to communicate seamlessly.</li>
+    <li><b>Increased Complexity:</b> Developers face challenges in creating universally compatible applications.</li>
+    <li><b>Security Concerns:</b> Multiple protocols mean multiple potential vulnerabilities.</li>
+  </Steps>
+</TextBlock>
+
+---
+
+### Matter: The Universal IoT Solution
+
+<TextBlock style={{ display: "grid" }}>
+  <Steps>
+    <li><b>Unified Communication:</b> A consistent protocol for all devices.</li>
+    <li><b>Open Source Approach:</b> Encouraging industry-wide adoption and collaboration.</li>
+    <li><b>Enhanced Security:</b> A singular, secure standard reduces vulnerabilities.</li>
+  </Steps>
+</TextBlock>
+
+---
+
+### Common Pitfalls of Setting Up Home Assistant
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li><b>Complex Configuration</b>: YAML files can be tricky for beginners -> you can use a UI for almost everything though 😎.</li>
+      <li><b>Device Compatibility</b>: Not all devices are supported out of the box.</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+### Devices in my setup
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>9 smart lights from TopGreener and Hilo</li>
+      <li>3 smart thermostats from Hilo</li>
+      <li>4 motion/light sensors from Philips Hue</li>
+      <li>2 FP2 millimeter wave presence/light sensors from Aqara</li>
+      <li>3 smart blinds from Yoolax</li>
+      <li>1 remote control IR/RF Broadlink RM4</li>
+      <li>1 smart TV from Samsung</li>
+      <li>1 smart vacuum from Roomba</li>
+      <li>1 smart camera from Google Nest</li>
+      <li>2 smart plugs from Hilo</li>
+      <li>4 smart speakers from Sonos</li>
+      <li>Some smart <b>useless</b> devices like washer, dryer, oven</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+# A few examples of automations
+
+---
+
+import turnOnLightsVideo from "./turn-on-lights.mp4"
+
+<VideoSlide title="Turn on/off lights on motion detection" src={turnOnLightsVideo} />
+
+---
+
+import closeBlindsWhenTooHotVideo from "./close-blinds-when-too-hot.mp4"
+
+<VideoSlide title="Close/Open blinds when temperature is getting too hot" src={closeBlindsWhenTooHotVideo} />
+
+---
+
+import openCloseBlindsImage from "./open-close-blinds.png"
+
+<ImageSlide title="Open/Close Blinds Automation UI" src={openCloseBlindsImage} />
+
+---
+
+import openCloseBlindsScriptImage from "./open-close-blinds-script.png"
+
+<ImageSlide title="Open/Close Blinds Script UI" src={openCloseBlindsScriptImage} />
+
+---
+
+<CodeSurfer>
+
+  ```yaml title="Same thing but in YAML"
+  alias: Close/open bedroom blinds based on temperature
+  sequence:
+    - if:
+      - condition: numeric_state
+      entity_id: sensor.thermostat_bedroom_temperature
+      above: 25.5
+    then:
+      - service: google_assistant_sdk.send_text_command
+      data:
+        command: close the blinds bedroom
+    else:
+      - condition: numeric_state
+      entity_id: sensor.thermostat_bedroom_temperature
+      below: 24.5
+      - service: google_assistant_sdk.send_text_command
+      data:
+        command: Open the blinds bedroom
+  mode: single
+  icon: mdi:blinds
+  ```
+
+</CodeSurfer>
+
+---
+
+
+## Other automations to inspire you
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>Start vacuum when at work</li>
+      <li>Adjust thermostats based on my location</li>
+      <li>Turn on computer by voice command</li>
+      <li>When my phone alarm goes off, open the blinds and play a random playlist of the day</li>
+      <li>Use presence sensing so when I'm not really moving at my desk, the lights remain turned on</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+# Deep dive on Samsung TV remote
+
+---
+
+## Researching existing solutions
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>I found this nice little open source UI component: <a href="https://github.com/usernein/tv-card" target="_blank">TV Card UI</a></li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+import tvCardImage from "./tv-card-ui.png"
+import { CodeBlock } from "../components/CodeBlock";
+
+<ImageSlide title="TV Card UI" src={tvCardImage} />
+
+---
+
+## Integrating the backend for the remote
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>Nothing was working as expected with the TV Card component</li>
+      <li>I stumbled onto this: <a href="https://github.com/ollo69/ha-samsungtv-smart" target="_blank">ha-samsungtv-smart</a> project</li>
+      <li>I had to modify the source code of the TV Card component to integrate this backend into it</li>
+      <li>I had to reverse engineer the communication flow of the TV backend to make the apps work</li>
+      <li>I needed to use my chromecast in order to turn on the TV</li>
+      <li>Set a static IP for my TV</li>
+      <li>Final step was to fix the CORS errors as my home assistant UI couldn't communicate directly with the TV</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+<CodeSurfer>
+
+  ```javascript title="TV Card UI"
+  handleActionClick(e) {
+    let action = e.currentTarget.action;
+    let info = this.custom_keys[action] || this.custom_sources[action] || keys[action] || sources[action];
+    const appsIdByAppName = { netflix: "3201907018807", prime: "3201910019365", youtube: "111299001912", spotify: "3201606009684", plex: "3201512006963" };
+    const apps = Object.keys(appsIdByAppName);
+
+    if (apps.includes(action)) {
+      fetch(`http://homeassistant.local:8080/http://192.168.0.155:8001/api/v2/applications/${appsIdByAppName[action]}`, {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch(console.error);
+    }
+    else if (info.key) {
+      this.sendKey(info.key);
+    }
+    if (info.service) {
+      const [domain, service] = info.service.split(".", 2);
+      this._hass.callService(domain, service, info.service_data);
+    }
+
+    if (this._config.enable_button_feedback === undefined || this._config.enable_button_feedback) {
+      fireEvent(window, "haptic", "light");
+    }
+  }
+  ```
+
+</CodeSurfer>
+
+---
+
+import tvFlowDiagram from "./tv-flow-diagram.png"
+
+<ImageSlide title="Summing it all up with a diagram" src={tvFlowDiagram} />
+
+---
+
+### Conclusion
+
+<TextBlock style={{ display: "grid" }}>
+  <ul>
+    <Steps>
+      <li>Home Assistant provides a powerful platform to help integrate IoT devices.</li>
+      <li>Having a smart home, isn't straightforward.</li>
+    </Steps>
+  </ul>
+</TextBlock>
+
+---
+
+import computerSetupFlex from "./computer-setup-flex.mp4"
+
+<VideoSlide title="Computer setup flex 🌈" src={computerSetupFlex} />
+
+---
+
+Thank you for listening :)
+
+<Footer>
+  <ProgressBar />
+</Footer>
